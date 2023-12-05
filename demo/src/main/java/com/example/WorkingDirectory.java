@@ -18,7 +18,11 @@ public class WorkingDirectory {
 
     public static WorkingDirectory getInstance(String path) {
         if (workingDirectory == null) {
-            workingDirectory = new WorkingDirectory(path);
+            File dir = new File(path);
+            if (dir.exists() && dir.isDirectory())
+                workingDirectory = new WorkingDirectory(path);
+            else
+                throw new IllegalArgumentException("Путь должен являться каталогом");
         }
         return workingDirectory;
     }
@@ -48,7 +52,7 @@ public class WorkingDirectory {
     public void goToParentDirectory() {
         String parent = (new File(directoryName)).getParent();
         if (parent == null) {
-            throw new IllegalStateException("Нет родительского каталогоа");
+            throw new IllegalStateException("Нет родительского каталога");
         }
         directoryName = parent;
     }
@@ -60,11 +64,13 @@ public class WorkingDirectory {
                 .contains(new File(child));
     }
 
-    public void createNewDirectory(String dirName) {
+    public boolean createNewDirectory(String dirName) {
         File newDirectory = new File(directoryName, dirName);
         if (!newDirectory.exists()) {
             newDirectory.mkdir();
+            return true;
         }
+        return false;
     }
 
     public void goToChild(String child) {
@@ -73,6 +79,7 @@ public class WorkingDirectory {
         if (Arrays.stream(dir.listFiles()).anyMatch(file -> file.equals(chFile))) {
             directoryName = chFile.getAbsolutePath();
         }
+        throw new IllegalArgumentException("Нет подкаталога " + child + " в " + directoryName);
     }
 
     private boolean deleteDirectory(File directoryToBeDeleted) {
