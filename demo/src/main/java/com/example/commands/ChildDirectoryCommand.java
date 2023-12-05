@@ -17,5 +17,4 @@ public class ChildDirectoryCommand implements ICommand {
             System.out.println(supposeChild + " не содержится в " + wd.getDirectoryName());
         }
     }
-    
 }

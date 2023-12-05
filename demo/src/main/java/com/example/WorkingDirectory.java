@@ -29,7 +29,8 @@ public class WorkingDirectory {
 
     public static WorkingDirectory getInstance() {
         if (workingDirectory == null) {
-            throw new IllegalStateException("Рабочая директория не инициализирована\n Воспользуйтесь getInstance(String path)");
+            throw new IllegalStateException(
+                    "Рабочая директория не инициализирована\n Воспользуйтесь getInstance(String path)");
         }
         return workingDirectory;
     }
@@ -61,7 +62,7 @@ public class WorkingDirectory {
         return Arrays.asList(
                 (new File(directoryName))
                         .listFiles())
-                .contains(new File(child));
+                .contains(new File(directoryName + "\\" + child));
     }
 
     public boolean createNewDirectory(String dirName) {
@@ -74,12 +75,13 @@ public class WorkingDirectory {
     }
 
     public void goToChild(String child) {
-        File chFile = new File(child);
         File dir = new File(directoryName);
-        if (Arrays.stream(dir.listFiles()).anyMatch(file -> file.equals(chFile))) {
-            directoryName = chFile.getAbsolutePath();
+        if (Arrays.stream(dir.listFiles(File::isDirectory))
+                .anyMatch(file -> file.getName().equals(child))) {
+            directoryName = directoryName + "\\" + child;
+        } else {
+            throw new IllegalArgumentException("Нет подкаталога " + child + " в " + directoryName);
         }
-        throw new IllegalArgumentException("Нет подкаталога " + child + " в " + directoryName);
     }
 
     private boolean deleteDirectory(File directoryToBeDeleted) {
@@ -93,15 +95,14 @@ public class WorkingDirectory {
     }
 
     public void deleteSubDirectories() {
-        for (File file : (new File(directoryName)).listFiles()) {
+        for (File file : (new File(directoryName)).listFiles(File::isDirectory)) {
             deleteDirectory(file);
         }
     }
 
-    public String[] find(String extention) {
-        return Arrays.stream(new File(directoryName)
-                .listFiles(file -> file.getName()
-                        .endsWith(extention)))
+    public String[] find(String extension) {
+        return Arrays.stream(new File(directoryName).listFiles(file -> file.getName().endsWith(extension)))
+                .map(File::getName)
                 .toArray(String[]::new);
     }
 
@@ -113,23 +114,33 @@ public class WorkingDirectory {
     }
 
     public String[] getSubDirectories() {
-        val responce = new ArrayList<String>();
-        getSubDirectories(new File(directoryName), responce);
-        return responce.toArray(String[]::new);
+        val response = new ArrayList<String>();
+        getSubDirectories(new File(directoryName), response);
+        return response.toArray(String[]::new);
     }
 
-    private boolean isExist(File searchDir, File disiredDir) {
-        File[] listChild = searchDir.listFiles(File::isDirectory);
-        for (File child : listChild) {
-            if (child.equals(disiredDir)) {
-                return true;
-            }      
+    private boolean isExist(File searchDir, String sourceName) {
+        if (searchDir.getName().equals(sourceName))
+            return true;
+        if (searchDir.isDirectory()) {
+            File[] files = searchDir.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        if (isExist(file, sourceName)) {
+                            return true;
+                        }
+                    } else if (file.getName().equals(sourceName)) {
+                        return true;
+                    }
+                }
+            }
         }
         return false;
     }
 
     public boolean isExist(String sourceName) {
-        return isExist(new File(directoryName), (new File(sourceName)));
+        return isExist(new File(directoryName), sourceName);
     }
 
 }
