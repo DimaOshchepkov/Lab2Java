@@ -2,6 +2,7 @@ package com.example.students;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonRootName;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@JsonRootName("subject")
 public class Subject implements Comparable<Subject>{
     private String name;
     private int grade;
