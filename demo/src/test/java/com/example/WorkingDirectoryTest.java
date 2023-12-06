@@ -63,14 +63,12 @@ class WorkingDirectoryTest {
     public void setUp() {
         createTestFolder();
         wd = WorkingDirectory.getInstance("src\\test\\resources\\testFolder");
-        System.setOut(new PrintStream(outputStreamCaptor));
     }
 
     @AfterEach
     public void tearDown() {
         createTestFolder();
         wd = WorkingDirectory.getInstance("src\\test\\resources\\testFolder");
-        System.setOut(standardOut);
     }
 
     @Test
