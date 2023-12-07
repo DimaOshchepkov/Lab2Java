@@ -36,12 +36,28 @@ public class Applicant {
                 %s
                 С уважением ФКиФМН.
                 """;
+
+        String textBlockNotPass = """
+                Здравствуйте, уважаемый(ая) %s!
+                К сожалению, вы не проходите ни на одну спецальность.
+                С уважением ФКиФМН.
+                """;
         String specialitysStr = "";
+
+        boolean isPass = false;
         for (val speciality : specialitys) {
-            if (speciality.isPass(this))
+            if (speciality.isPass(this)) {
                 specialitysStr += speciality.toString() + "\n";
+                isPass = true;
+            }
         }
-        val message = String.format(textBlock, name, specialitysStr);
+        String message;
+        if (!isPass) {
+            message = String.format(textBlockNotPass, name);
+        }
+        else {
+            message = String.format(textBlock, name, specialitysStr);
+        }
         filePath += "\\" + name + "_" + Integer.toString(id) + ".txt";
         try {
             FileWriter writer = new FileWriter(filePath);

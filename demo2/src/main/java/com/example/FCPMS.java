@@ -1,7 +1,9 @@
 package com.example;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.example.students.Students;
 import com.example.speciality.ISpeciality;
@@ -15,17 +17,21 @@ import lombok.val;
 public class FCPMS {
 
     private ObjectMapper objectMapper;
-    private List<Applicant> applicants;
+    private List<Applicant> applicants = new ArrayList<>();
     private List<ISpeciality> specialities;
 
     public FCPMS() {
-        applicants = new ArrayList<>();
         specialities = List.of(new PMI(), new TeacherMathsInformatics());
         objectMapper = new ObjectMapper();
         try {
             val json = getClass().getClassLoader().getResourceAsStream("applicants.json");
-            Students students = objectMapper.readValue(json, Students.class);
-            applicants = students.getStudents().stream().map(Applicant.class::cast).toList();
+            Students students = objectMapper.readValue(new File("src/main/resources/applicants.json"), Students.class);
+            applicants = students.getStudents().stream().map(stud -> Applicant.builder()
+                    .name(stud.getName())
+                    .id(stud.getId())
+                    .faculty(this)
+                    .subjects(stud.getSubject())
+                    .build()).collect(Collectors.toList());
         } catch (Exception exception) {
             exception.printStackTrace();
         }

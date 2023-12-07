@@ -7,10 +7,7 @@ import java.util.Scanner;
 import com.example.students.Applicant;
 import com.example.students.Subject;
 
-/**
- * Hello world!
- *
- */
+
 public class App {
     public static void main(String[] args) {
         FCPMS faculty = new FCPMS();
@@ -21,12 +18,11 @@ public class App {
         while (addMoreUsers) {
             String fullName = readStringInput(scanner, "Введите ФИО: ");
             int numOfSubjects = Integer.parseInt(readStringInput(scanner, "Введите количество предметов: "));
-            scanner.nextLine(); // Считываем лишний перевод строки
 
             List<Subject> lSubj = new ArrayList<>();
             for (int i = 0; i < numOfSubjects; i++) {
                 String name = readStringInput(scanner, "Введите название предмета " + (i + 1) + ": ");
-                int grade = Integer.parseInt(readStringInput(scanner, "Введите бал " + (i + 1) + ": "));
+                int grade = Integer.parseInt(readStringInput(scanner, "Введите бал предмета" + (i + 1) + ": "));
                 lSubj.add(new Subject(name, grade));
             }
 
