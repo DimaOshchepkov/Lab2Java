@@ -1,15 +1,16 @@
 package com.example.students;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.List;
 
 import com.example.FCPMS;
+import com.example.IWriter;
+import com.example.PdfWriterImpl;
+import com.example.TxtWriterImpl;
 import com.example.speciality.ISpeciality;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.val;
 
 @Builder
@@ -21,12 +22,21 @@ public class Applicant {
     protected List<Subject> subjects;
     protected FCPMS faculty;
 
+    @Setter
+    @Builder.Default
+    protected IWriter writer = new PdfWriterImpl();
+
     public Applicant(int id, String name, List<Subject> subjects, FCPMS faculty) {
+        this(id, name, subjects, faculty, new TxtWriterImpl());
+    }
+
+    public Applicant(int id, String name, List<Subject> subjects, FCPMS faculty, IWriter writer) {
         this.id = id;
         this.name = name;
         this.subjects = subjects;
         this.faculty = faculty;
         faculty.addApplicant(this);
+        this.writer = writer;
     }
 
     public void getLetter(List<ISpeciality> specialitys, String filePath) {
@@ -58,17 +68,8 @@ public class Applicant {
         else {
             message = String.format(textBlock, name, specialitysStr);
         }
-        filePath += "\\" + name + "_" + Integer.toString(id) + ".txt";
-        try {
-            FileWriter writer = new FileWriter(filePath);
-            BufferedWriter bufferWriter = new BufferedWriter(writer);
-            bufferWriter.write(message);
-            bufferWriter.close();
-
-            System.out.println("Файл успешно создан и записан.");
-        } catch (IOException e) {
-            System.out.println("Ошибка при создании файла: " + e.getMessage());
-        }
+        filePath += "\\" + name + "_" + Integer.toString(id) + writer.getExtention();
+        writer.write(filePath, message);
     }
 
 }
